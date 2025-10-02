@@ -1,3 +1,15 @@
+## [1.3.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.2.1...v1.3.0) (2025-10-02)
+
+
+### ✨ Features ✨
+
+* increase resource usage ([66dd0d1](https://github.com/AtomiCloud/alcohol.carbon/commit/66dd0d10557c2e743ba99338db225eeb02613515))
+
+
+### 🐛 Bug Fixes 🐛
+
+* incorrect admin class ([64ccb5e](https://github.com/AtomiCloud/alcohol.carbon/commit/64ccb5e8f80edbf436f6bd59bcd1d6032fe067b5))
+
 ## [1.2.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.2.0...v1.2.1) (2025-10-02)
 
 
