@@ -15,6 +15,8 @@ Root Chart for Project Alcohol
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| lithium.adminIngress.annotations."cert-manager.io/cluster-issuer" | string | `"entei-zinc-letsencrypt-issuer"` |  |
+| lithium.adminIngress.className | string | `"nginx"` |  |
 | lithium.adminIngress.enabled | bool | `false` |  |
 | lithium.app.adminEndpoint | string | `"https://admin.lithium.alcohol.lapras.atomi.cloud"` |  |
 | lithium.app.endpoint | string | `"https://api.lithium.alcohol.lapras.cluster.atomi.cloud"` |  |

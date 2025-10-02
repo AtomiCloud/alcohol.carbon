@@ -41,6 +41,9 @@ lithium:
 
   adminIngress:
     enabled: false
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: 'entei-zinc-letsencrypt-issuer'
 
   replicaCount: 2
   autoscaling:
