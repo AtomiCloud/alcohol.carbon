@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.2.0...v1.2.1) (2025-10-02)
+
+
+### 🐛 Bug Fixes 🐛
+
+* remove chart from labels ([2cdc156](https://github.com/AtomiCloud/alcohol.carbon/commit/2cdc1560491bb2e3bb30a12f7e70be021cc3e88c))
+
 ## [1.2.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.1.0...v1.2.0) (2025-10-02)
 
 
