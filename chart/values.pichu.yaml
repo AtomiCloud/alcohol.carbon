@@ -1,0 +1,65 @@
+serviceTree: &serviceTree
+  landscape: &landscape pichu
+
+tags: &tags
+  atomi.cloud/landscape: *landscape
+
+lithium:
+  serviceTree:
+    <<: *serviceTree
+  tags:
+    <<: *tags
+
+  bromine:
+    serviceTree:
+      <<: *serviceTree
+
+  ingress:
+    hosts:
+      - host: api.lithium.alcohol.pichu.cluster.atomi.cloud
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - api.lithium.alcohol.pichu.cluster.atomi.cloud
+        secretName: api-lithium-alcohol-pichu-tls
+
+  replicaCount: 1
+
+  maincache: {}
+
+  app:
+    endpoint: "https://api.lithium.alcohol.pichu.cluster.atomi.cloud"
+    adminEndpoint: "https://admin.lithium.alcohol.pichu.atomi.cloud"
+
+zinc:
+  serviceTree:
+    <<: *serviceTree
+
+  bromine:
+    serviceTree:
+      <<: *serviceTree
+
+
+  api:
+    serviceTree:
+      <<: *serviceTree
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 80
+      containerPort: 9050
+    ingress:
+      hosts:
+        - host: api.zinc.alcohol.pichu.cluster.atomi.cloud
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
+      tls:
+        - hosts:
+            - api.zinc.alcohol.pichu.cluster.atomi.cloud
+          secretName: api-zinc-alcohol-pichu-tls
+  migration:
+    serviceTree:
+      <<: *serviceTree

@@ -1,0 +1,17 @@
+apiVersion: v2
+name: alcohol-carbon
+description: Root Chart for Project Alcohol
+
+type: application
+version: 0.1.0
+appVersion: '0.1.0'
+
+dependencies:
+  - name: root-chart
+    version: v1.5.0
+    alias: zinc
+    repository: oci://ghcr.io/atomicloud/alcohol.zinc
+  - name: aldehyde-lithium
+    version: v1.0.0
+    alias: lithium
+    repository: oci://ghcr.io/atomicloud/aldehyde.lithium

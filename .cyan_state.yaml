@@ -1,0 +1,72 @@
+atomi/workspace:
+  active: true
+  history:
+    - version: 21
+      time: 2025-09-20T08:13:01.248376Z
+      answers:
+        atomi/workspace/platform:
+          type: String
+          value: alcohol
+        atomi/workspace/enable-helm:
+          type: Bool
+          value: true
+        atomi/workspace/enable-secret:
+          type: Bool
+          value: false
+        atomi/workspace/runtime:
+          type: String
+          value: None
+        atomi/workspace/enable-docker:
+          type: Bool
+          value: false
+        atomi/workspace/service:
+          type: String
+          value: carbon
+      deterministic_states: {}
+atomi/helm:
+  active: true
+  history:
+    - version: 9
+      time: 2025-10-01T23:59:00.081148Z
+      answers:
+        service:
+          type: String
+          value: carbon
+        atomi/helm/security:
+          type: Bool
+          value: false
+        atomi/helm/deployment:
+          type: Bool
+          value: false
+        platform:
+          type: String
+          value: alcohol
+        module:
+          type: String
+          value: root
+        layer:
+          type: String
+          value: '2'
+        desc:
+          type: String
+          value: Root Chart for Project Alcohol
+      deterministic_states: {}
+atomi/nix-init:
+  active: true
+  history:
+    - version: 14
+      time: 2025-09-20T08:11:55.168525Z
+      answers:
+        standard-binary:
+          type: Bool
+          value: true
+        init-type:
+          type: String
+          value: Standard
+        pre-commit:
+          type: Bool
+          value: true
+        Description of this Project:
+          type: String
+          value: alcohol carbon Helm Chart
+      deterministic_states: {}

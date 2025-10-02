@@ -1,0 +1,22 @@
+#
+name: CD
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+jobs:
+  #
+  #
+  helm:
+    name: Helm Chart
+    uses: ./.github/workflows/⚡reusable-helm.yaml
+    secrets: inherit
+    with:
+      atomi_platform: alcohol
+      atomi_service: carbon
+      chart_path: ./chart
+
+      version: ${{ github.ref_name }}
+  #
+#
