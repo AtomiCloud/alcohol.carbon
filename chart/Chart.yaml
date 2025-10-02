@@ -12,6 +12,6 @@ dependencies:
     alias: zinc
     repository: oci://ghcr.io/atomicloud/alcohol.zinc
   - name: aldehyde-lithium
-    version: v1.1.0
+    version: v1.1.1
     alias: lithium
     repository: oci://ghcr.io/atomicloud/aldehyde.lithium
