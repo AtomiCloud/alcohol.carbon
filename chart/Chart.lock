@@ -4,6 +4,6 @@ dependencies:
   version: v1.5.0
 - name: aldehyde-lithium
   repository: oci://ghcr.io/atomicloud/aldehyde.lithium
-  version: v1.0.0
-digest: sha256:65c04d814f7c3f4b7d856111144239b27659b935d019a2e9a0a9d070c5d56dc0
-generated: "2025-10-02T10:27:22.124921+08:00"
+  version: v1.0.1
+digest: sha256:2ca71aee21e9d04f6e57bd8d2320cabd1b40e243bbba456d187f5585bd24262d
+generated: "2025-10-02T10:55:18.139533+08:00"
