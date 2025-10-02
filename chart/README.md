@@ -46,8 +46,8 @@ Root Chart for Project Alcohol
 | lithium.replicaCount | int | `2` |  |
 | lithium.resources.limits.cpu | int | `1` |  |
 | lithium.resources.limits.memory | string | `"1Gi"` |  |
-| lithium.resources.requests.cpu | string | `"100m"` |  |
-| lithium.resources.requests.memory | string | `"64Mi"` |  |
+| lithium.resources.requests.cpu | string | `"250m"` |  |
+| lithium.resources.requests.memory | string | `"256Mi"` |  |
 | lithium.serviceTree.<<.layer | string | `"2"` |  |
 | lithium.serviceTree.<<.platform | string | `"alcohol"` |  |
 | lithium.tags.<<."atomi.cloud/layer" | string | `"2"` |  |
