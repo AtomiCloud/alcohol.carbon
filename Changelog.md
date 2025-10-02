@@ -1,3 +1,10 @@
+## [1.2.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.1.0...v1.2.0) (2025-10-02)
+
+
+### ✨ Features ✨
+
+* use public admin ([2d0e9fc](https://github.com/AtomiCloud/alcohol.carbon/commit/2d0e9fc5927323e7ba73a2d26823dfea243c645e))
+
 ## [1.1.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.0.1...v1.1.0) (2025-10-02)
 
 
