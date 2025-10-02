@@ -1,3 +1,10 @@
+## [1.1.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.0.1...v1.1.0) (2025-10-02)
+
+
+### ✨ Features ✨
+
+* **lithium:** upgrade to 1.0.2 ([194108b](https://github.com/AtomiCloud/alcohol.carbon/commit/194108bbe667c12d73be3bb058601f7f4e365821))
+
 ## [1.0.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.0.0...v1.0.1) (2025-10-02)
 
 
