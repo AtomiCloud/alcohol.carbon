@@ -25,7 +25,7 @@ lithium:
           - api.lithium.alcohol.pichu.cluster.atomi.cloud
         secretName: api-lithium-alcohol-pichu-tls
   adminIngress:
-    enabled: true
+    enabled: false
     hosts:
       - host: admin.lithium.alcohol.pichu.cluster.atomi.cloud
         paths:
@@ -42,7 +42,7 @@ lithium:
 
   app:
     endpoint: "https://api.lithium.alcohol.pichu.cluster.atomi.cloud"
-    adminEndpoint: "https://admin.lithium.alcohol.pichu.cluster.atomi.cloud"
+    adminEndpoint: "https://admin.lithium.alcohol.pichu.atomi.cloud"
 
 zinc:
   serviceTree:
