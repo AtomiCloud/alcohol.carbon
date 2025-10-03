@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.3.0...v1.3.1) (2025-10-03)
+
+
+### 🐛 Bug Fixes 🐛
+
+* incorrect admin class ([8cfcd66](https://github.com/AtomiCloud/alcohol.carbon/commit/8cfcd66970e3e9114df7f553f2d963a516891fb1))
+
 ## [1.3.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.2.1...v1.3.0) (2025-10-02)
 
 
