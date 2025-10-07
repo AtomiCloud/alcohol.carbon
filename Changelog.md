@@ -1,3 +1,10 @@
+## [1.5.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.4.0...v1.5.0) (2025-10-07)
+
+
+### ✨ Features ✨
+
+* **zinc:** upgrade to 1.15.1 ([b2e78a9](https://github.com/AtomiCloud/alcohol.carbon/commit/b2e78a9077aac4545bab90009d3ec4b57702bd97))
+
 ## [1.4.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.3.1...v1.4.0) (2025-10-07)
 
 
