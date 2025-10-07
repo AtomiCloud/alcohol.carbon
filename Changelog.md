@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.5.0...v1.5.1) (2025-10-07)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade to 1.15.2 ([a998209](https://github.com/AtomiCloud/alcohol.carbon/commit/a998209a53f9f55a3f523a6150edf122e6e005d0))
+
 ## [1.5.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.4.0...v1.5.0) (2025-10-07)
 
 
