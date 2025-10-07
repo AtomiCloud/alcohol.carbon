@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.5.1...v1.5.2) (2025-10-07)
+
+
+### 🐛 Bug Fixes 🐛
+
+* incorrect endpoint for logto management ([41722ab](https://github.com/AtomiCloud/alcohol.carbon/commit/41722ab5ce9091348d6d6f8bb3c92074c92f9a8e))
+
 ## [1.5.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.5.0...v1.5.1) (2025-10-07)
 
 
