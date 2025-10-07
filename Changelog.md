@@ -1,3 +1,10 @@
+## [1.4.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.3.1...v1.4.0) (2025-10-07)
+
+
+### ✨ Features ✨
+
+* upgrade backend ([8cfc1b2](https://github.com/AtomiCloud/alcohol.carbon/commit/8cfc1b2be7e10875be67200da5f1c2f5c0fa4638))
+
 ## [1.3.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.3.0...v1.3.1) (2025-10-03)
 
 
