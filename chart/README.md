@@ -8,7 +8,7 @@ Root Chart for Project Alcohol
 
 | Repository | Name | Version |
 |------------|------|---------|
-| oci://ghcr.io/atomicloud/alcohol.zinc | zinc(root-chart) | v1.16.1 |
+| oci://ghcr.io/atomicloud/alcohol.zinc | zinc(root-chart) | v1.17.0 |
 | oci://ghcr.io/atomicloud/aldehyde.lithium | lithium(aldehyde-lithium) | v1.1.1 |
 
 ## Values
