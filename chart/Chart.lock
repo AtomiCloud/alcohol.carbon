@@ -1,9 +1,9 @@
 dependencies:
 - name: root-chart
   repository: oci://ghcr.io/atomicloud/alcohol.zinc
-  version: v1.22.1
+  version: v1.22.2
 - name: aldehyde-lithium
   repository: oci://ghcr.io/atomicloud/aldehyde.lithium
   version: v1.1.1
-digest: sha256:420e2fa151dc082d5cb6d8681d1fdfc4338deb91d0e9cd16960f487c6e320674
-generated: "2026-06-28T23:03:23.042328+08:00"
+digest: sha256:943861658fbbbc02133995f5a619a3972b30d4c4ec6ce32d42d96e5c7aecb61e
+generated: "2026-06-29T00:01:06.027071+08:00"
