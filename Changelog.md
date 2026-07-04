@@ -1,3 +1,15 @@
+## [1.19.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.18.0...v1.19.0) (2026-07-04)
+
+
+### ✨ Features ✨
+
+* upgrade zinc to 1.25.0 ([c8c6164](https://github.com/AtomiCloud/alcohol.carbon/commit/c8c6164ee59b1226603fa75c154a3eda2cc95cb5))
+
+
+### 🐛 Bug Fixes 🐛
+
+* sync Chart.lock with zinc 1.25.0 bump ([769baa0](https://github.com/AtomiCloud/alcohol.carbon/commit/769baa033b2a450c1066f86ff0e517b73fdf0712))
+
 ## [1.18.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.17.0...v1.18.0) (2026-06-30)
 
 
