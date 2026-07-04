@@ -1,3 +1,10 @@
+## [1.20.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.19.0...v1.20.0) (2026-07-04)
+
+
+### ✨ Features ✨
+
+* upgrade zinc to 1.26.0 ([ae53e1a](https://github.com/AtomiCloud/alcohol.carbon/commit/ae53e1a7386a3a344a567b61858dc2bc70983db0))
+
 ## [1.19.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.18.0...v1.19.0) (2026-07-04)
 
 
