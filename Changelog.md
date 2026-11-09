@@ -1,3 +1,10 @@
+## [1.29.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.0...v1.29.1) (2026-11-09)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade zinc for daily habit safety ([742810d](https://github.com/AtomiCloud/alcohol.carbon/commit/742810d4769234d92a962b56e6fe15395189448d))
+
 ## [1.29.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.28.0...v1.29.0) (2026-07-12)
 
 
