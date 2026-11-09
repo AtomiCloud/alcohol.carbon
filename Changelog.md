@@ -1,3 +1,10 @@
+## [1.29.3](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.2...v1.29.3) (2026-11-09)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade zinc to v1.35.0 for phone-timezone check deadlines ([3cfeb9c](https://github.com/AtomiCloud/alcohol.carbon/commit/3cfeb9c9304a04eb48a3d7eb093fe93af224b17a)), closes [#82](https://github.com/AtomiCloud/alcohol.carbon/issues/82)
+
 ## [1.29.2](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.1...v1.29.2) (2026-11-09)
 
 
