@@ -1,3 +1,10 @@
+## [1.29.2](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.1...v1.29.2) (2026-11-09)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade zinc to v1.34.0 for core checks ([b641b54](https://github.com/AtomiCloud/alcohol.carbon/commit/b641b54fa7f5ab036812abba0eaefbcc9219d553)), closes [#80](https://github.com/AtomiCloud/alcohol.carbon/issues/80)
+
 ## [1.29.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.0...v1.29.1) (2026-11-09)
 
 
