@@ -1,3 +1,10 @@
+## [1.29.5](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.4...v1.29.5) (2026-11-10)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade zinc to v1.38.0 for proof plugins ([a537c6d](https://github.com/AtomiCloud/alcohol.carbon/commit/a537c6d203dae7ebdd096544476e589a14bb1f4e)), closes [#88](https://github.com/AtomiCloud/alcohol.carbon/issues/88)
+
 ## [1.29.4](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.3...v1.29.4) (2026-11-10)
 
 
