@@ -1,3 +1,10 @@
+## [1.29.4](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.3...v1.29.4) (2026-11-10)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade zinc to v1.37.0 for Today overview fields ([b78bb6b](https://github.com/AtomiCloud/alcohol.carbon/commit/b78bb6b12342ff6c097f39067b31b9b89f5057b6)), closes [#86](https://github.com/AtomiCloud/alcohol.carbon/issues/86) [#85](https://github.com/AtomiCloud/alcohol.carbon/issues/85) [#87](https://github.com/AtomiCloud/alcohol.carbon/issues/87)
+
 ## [1.29.3](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.2...v1.29.3) (2026-11-09)
 
 
