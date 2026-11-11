@@ -1,3 +1,10 @@
+## [1.29.6](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.5...v1.29.6) (2026-11-11)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade zinc to v1.39.0 for strava, friends and faster today ([5a8519e](https://github.com/AtomiCloud/alcohol.carbon/commit/5a8519e787707fd7ba23409f7b88b7d921e963d3)), closes [#89](https://github.com/AtomiCloud/alcohol.carbon/issues/89) [#90](https://github.com/AtomiCloud/alcohol.carbon/issues/90) [#91](https://github.com/AtomiCloud/alcohol.carbon/issues/91)
+
 ## [1.29.5](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.4...v1.29.5) (2026-11-10)
 
 
