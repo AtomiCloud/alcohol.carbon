@@ -1,3 +1,10 @@
+## [1.29.8](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.7...v1.29.8) (2026-11-12)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade zinc to v1.41.0 for optional charities ([7892f01](https://github.com/AtomiCloud/alcohol.carbon/commit/7892f013960b536e914ec400707f5e1ca360c0fe)), closes [#93](https://github.com/AtomiCloud/alcohol.carbon/issues/93)
+
 ## [1.29.7](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.6...v1.29.7) (2026-11-12)
 
 
