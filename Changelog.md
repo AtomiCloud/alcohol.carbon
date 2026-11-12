@@ -1,3 +1,10 @@
+## [1.29.7](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.6...v1.29.7) (2026-11-12)
+
+
+### 🐛 Bug Fixes 🐛
+
+* upgrade zinc to v1.40.0 for permanent invite links ([5d037c2](https://github.com/AtomiCloud/alcohol.carbon/commit/5d037c2e85aa3d6eec2592f51b80a319e64e949e)), closes [#92](https://github.com/AtomiCloud/alcohol.carbon/issues/92)
+
 ## [1.29.6](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.5...v1.29.6) (2026-11-11)
 
 
