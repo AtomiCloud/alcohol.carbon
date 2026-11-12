@@ -57,6 +57,10 @@ zinc:
     serviceTree:
       <<: *serviceTree
     replicaCount: 1
+    # Change this value to restart zinc-api so it re-reads secrets added in Infisical: the
+    # cluster copies them about once an hour, and the server reads them only at start-up.
+    podAnnotations:
+      atomi.cloud/secrets-reloaded: '2026-11-12-strava'
     service:
       type: ClusterIP
       port: 80
