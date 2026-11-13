@@ -1,3 +1,10 @@
+## [1.29.10](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.9...v1.29.10) (2026-11-13)
+
+
+### 🐛 Bug Fixes 🐛
+
+* zinc v1.42.0 (vacation New Year window, freeze cut to cap) ([c5792a0](https://github.com/AtomiCloud/alcohol.carbon/commit/c5792a03f51d868438391a369d5ace8a45576f66))
+
 ## [1.29.9](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.8...v1.29.9) (2026-11-13)
 
 
