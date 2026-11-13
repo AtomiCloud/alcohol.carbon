@@ -2,12 +2,15 @@ name: CI
 
 on:
   push:
+    branches: ['**']
+
+permissions:
+  contents: read
 
 jobs:
   precommit:
     name: Pre-Commit
     uses: ./.github/workflows/⚡reusable-precommit.yaml
-    secrets: inherit
     with:
       atomi_platform: alcohol
       atomi_service: carbon
@@ -15,10 +18,21 @@ jobs:
   #
   helm:
     name: Helm Chart
-    uses: ./.github/workflows/⚡reusable-helm.yaml
-    secrets: inherit
-    with:
-      atomi_platform: alcohol
-      atomi_service: carbon
-      chart_path: ./chart
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: AtomiCloud/actions.setup-nix@v2
+        with:
+          namespacelabs: 'false'
+      # This path never invokes the publisher or receives registry credentials.
+      - name: Build Helm locally
+        run: |
+          nix develop .#ci -c bash -euo pipefail <<'BUILD'
+          helm dependency build chart
+          helm lint chart
+          helm template branch-ci chart > /dev/null
+          helm package chart --destination "$RUNNER_TEMP/helm"
+          BUILD
+  deploy-test:
+    name: Deploy Test
+    uses: ./.github/workflows/⚡reusable-deploy-test.yaml
   #
