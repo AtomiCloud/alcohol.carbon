@@ -1,3 +1,10 @@
+## [1.29.9](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.8...v1.29.9) (2026-11-13)
+
+
+### 🐛 Bug Fixes 🐛
+
+* zinc v1.41.1 (free plan: 3 skips, no freezes) ([1d0d8d0](https://github.com/AtomiCloud/alcohol.carbon/commit/1d0d8d0df39b459bc4c9701b083d67c4b8f7a6e9))
+
 ## [1.29.8](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.7...v1.29.8) (2026-11-12)
 
 
