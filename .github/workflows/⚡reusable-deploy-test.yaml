@@ -17,4 +17,9 @@ jobs:
         run: nix develop -c pls render-test
 
       - name: Rollout probe against a stub server
+        if: ${{ !cancelled() }}
         run: nix develop -c pls rollout-probe:test
+
+      - name: Reject misleading Argo health acceptance
+        if: ${{ !cancelled() }}
+        run: nix develop -c pls rollout-state-check:test

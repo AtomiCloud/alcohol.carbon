@@ -17,22 +17,29 @@ on:
         description: Expected zinc version (GET / .version), e.g. v1.44.0. Default is the one in chart/Chart.yaml.
         type: string
         required: false
+
+permissions:
+  contents: read
+
 jobs:
   #
   #
   helm:
     name: Helm Chart
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.ref_name != ''
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/⚡reusable-helm.yaml
-    secrets: inherit
     with:
       atomi_platform: alcohol
       atomi_service: carbon
       chart_path: ./chart
 
       version: ${{ github.ref_name }}
-  # pichu syncs every carbon release by itself, so the probe starts with the publish and
-  # watches the whole rollout. Fails on any non-2xx from GET /.
+  # This parallel job is supplemental, NOT a pre-publication readiness gate.
+  # The release manager must confirm the external continuous probe is active before
+  # publication. Any non-2xx or transport error stays red; exception review is separate.
   rollout-probe:
     name: Rollout Probe
     runs-on: ubuntu-22.04
@@ -47,8 +54,16 @@ jobs:
           LANDSCAPE: ${{ inputs.landscape || 'pichu' }}
           VERSION: ${{ inputs.version }}
         run: |
+          set -o pipefail
           version="${VERSION:-$(nix develop -c yq '.dependencies[] | select(.alias == "zinc") | .version' chart/Chart.yaml)}"
-          nix develop -c pls rollout-probe -- "https://api.zinc.alcohol.${LANDSCAPE}.cluster.atomi.cloud" "$version"
-  #
+          nix develop -c pls rollout-probe -- "https://api.zinc.alcohol.${LANDSCAPE}.cluster.atomi.cloud" "$version" 2>&1 | tee rollout-probe.log
 
+      - name: Retain every raw probe sample, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollout-probe-${{ inputs.landscape || 'pichu' }}-${{ github.run_attempt }}
+          path: rollout-probe.log
+          retention-days: 30
+  #
 #

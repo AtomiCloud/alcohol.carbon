@@ -100,8 +100,8 @@ tasks:
 
   rollout-probe:
     desc: >-
-      Polls GET <base-url>/ once a second through a zinc rollout and fails on any non-2xx or two
-      timeouts in a row. Usage: pls rollout-probe -- <base-url> <expected-zinc-version>
+      Polls GET <base-url>/ once a second through a zinc rollout and fails on any non-2xx or
+      transport error. Usage: pls rollout-probe -- <base-url> <expected-zinc-version>
     silent: true
     cmds:
       - |
@@ -118,26 +118,36 @@ tasks:
         trap 'rm -f "$body" "$changes"' EXIT
 
         start="$(date +%s)"
-        failed=0; errs=0; mode=""; last=""; stable_since=""; result=""
+        failed=0; http_failures=0; transport_errors=0; first_failure_ms=""; last_failure_ms=""
+        mode=""; last=""; stable_since=""; result=""; previous_start_ms=""
+        echo "probe_config interval_s=$interval request_timeout_s=3 stable_s=$stable_s rollout_timeout_s=$timeout_s fixed_s=$fixed_s expected=$expected"
         while :; do
           now="$(date +%s)"
-          ts="$(date -u +%H:%M:%S)"
+          request_start_ms="$(date +%s%3N)"
+          gap_ms=0
+          [ -z "$previous_start_ms" ] || gap_ms=$((request_start_ms - previous_start_ms))
+          previous_start_ms="$request_start_ms"
           ok=0
           if code="$(curl -s -m 3 -o "$body" -w '%{http_code}' "$base/")"; then
-            errs=0
             ver="$(jq -r '.version // ""' "$body" 2>/dev/null || true)"
-            case "$code" in 2??) ok=1 ;; *) failed=1 ;; esac
+            case "$code" in 2??) ok=1 ;; *) http_failures=$((http_failures + 1)) ;; esac
             state="$code ${ver:-?}"
           else
-            errs=$((errs + 1)); ver=""
-            [ "$errs" -lt 2 ] || failed=1
+            transport_errors=$((transport_errors + 1)); ver=""
             state="no response (timeout or connection error)"
           fi
-          echo "$ts $state"
+          stamp="$(date -u '+%s%3N %Y-%m-%dT%H:%M:%S.%3NZ')"
+          sample_ms="${stamp%% *}"; ts="${stamp#* }"
+          if [ "$ok" = 0 ]; then
+            failed=1
+            [ -n "$first_failure_ms" ] || first_failure_ms="$sample_ms"
+            last_failure_ms="$sample_ms"
+          fi
+          echo "$ts $state request_start_epoch_ms=$request_start_ms duration_ms=$((sample_ms - request_start_ms)) start_gap_ms=$gap_ms"
           [ "$state" = "$last" ] || { echo "$ts $state" >>"$changes"; last="$state"; }
 
           if [ -z "$mode" ]; then
-            if [ "$ver" = "$expected" ]; then mode=fixed; echo "already serving $expected: polling for ${fixed_s}s"
+            if [ "$ok" = 1 ] && [ "$ver" = "$expected" ]; then mode=fixed; echo "already serving $expected: polling for ${fixed_s}s"
             else mode=rollout; fi
           fi
           if [ "$mode" = fixed ]; then
@@ -156,9 +166,14 @@ tasks:
 
         echo "--- timeline (status and version changes, UTC)"
         cat "$changes"
+        echo "non_2xx=$http_failures transport_errors=$transport_errors"
+        if [ "$failed" = 1 ]; then
+          echo "first_failed_sample_epoch_ms=$first_failure_ms last_failed_sample_epoch_ms=$last_failure_ms failed_span_ms=$((last_failure_ms - first_failure_ms))"
+          echo "Failed span includes intervening successes and transport errors; any pichu first-adoption exception requires separate review."
+        fi
         if [ -n "$result" ]; then echo "❌ $result"; exit 1; fi
         if [ "$failed" = 1 ]; then echo "❌ the API returned a non-2xx or stopped answering during the rollout"; exit 1; fi
-        echo "✅ zero non-2xx responses; $expected served for ${stable_s}s"
+        echo "✅ zero non-2xx responses and zero transport errors; $expected observed (mode=$mode)"
 
   rollout-probe:test:
     desc: Runs the rollout probe against a local stub server
@@ -169,7 +184,8 @@ tasks:
         bash <<'BASH'
         set -euo pipefail
         stub="$(mktemp)"
-        trap 'rm -f "$stub"' EXIT
+        log="$(mktemp)"
+        trap 'rm -f "$stub" "$log"' EXIT
         # Serves one planned "status:version" per request; the last entry repeats.
         cat >"$stub" <<'PY'
         import http.server, json, sys
@@ -178,6 +194,9 @@ tasks:
             def do_GET(self):
                 code, ver = plan[min(n[0], len(plan) - 1)].split(":")
                 n[0] += 1
+                if code == "drop":
+                    self.close_connection = True
+                    return
                 body = json.dumps({"version": ver, "status": "OK"}).encode()
                 self.send_response(int(code))
                 self.send_header("Content-Type", "application/json")
@@ -197,7 +216,7 @@ tasks:
           sleep 0.5
           set +e
           PROBE_INTERVAL_S=0.2 PROBE_STABLE_S=2 PROBE_TIMEOUT_S=6 PROBE_FIXED_S=2 \
-            "{{.TASK_EXE}}" rollout-probe -- "http://127.0.0.1:$port" v2 >/dev/null 2>&1
+            "{{.TASK_EXE}}" rollout-probe -- "http://127.0.0.1:$port" v2 >"$log" 2>&1
           rc=$?
           set -e
           kill "$pid" 2>/dev/null || true
@@ -205,13 +224,100 @@ tasks:
             echo "ok   $name (exit $rc)"
           else
             echo "FAIL $name: wanted $want, exit $rc"; fails=$((fails + 1))
+            cat "$log"
+          fi
+          if [ -n "${4:-}" ] && ! grep -q "$4" "$log"; then
+            echo "FAIL $name: missing failure counts $4"; fails=$((fails + 1))
+            cat "$log"
+          fi
+          if [ "$name" = "failures separated by successes" ]; then
+            span="$(sed -n 's/.* failed_span_ms=\([0-9]*\)$/\1/p' "$log")"
+            if [ "${span:-0}" -lt 400 ]; then
+              echo "FAIL $name: span must include the intervening success"; fails=$((fails + 1))
+              cat "$log"
+            fi
           fi
         }
         case_ "version flips with only 200s" pass "200:v1,200:v1,200:v1,200:v2"
         case_ "2 s burst of 503" fail "200:v1,200:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,200:v2"
         case_ "a single 404" fail "200:v1,404:,200:v2"
+        case_ "a single transport error" fail "200:v1,drop:,200:v2" "non_2xx=0 transport_errors=1"
+        case_ "failures separated by successes" fail "200:v1,503:,200:v1,drop:,200:v2" "non_2xx=1 transport_errors=1"
         case_ "version never flips" fail "200:v1"
         case_ "already on the version, all 200s" pass "200:v2"
         if [ "$fails" -gt 0 ]; then echo "❌ $fails probe case(s) failed"; exit 1; fi
         echo "✅ rollout probe cases passed"
         BASH
+
+  rollout-state-check:
+    desc: Checks same-context metadata snapshots for in-place adoption; Argo Healthy alone is insufficient
+    silent: true
+    cmds:
+      - |
+        set -euo pipefail
+        set -- {{.CLI_ARGS}}
+        jq -en --slurpfile before "${1:?before objects JSON}" --slurpfile after "${2:?after objects JSON}" --slurpfile app "${3:?Application JSON}" '
+          def api:
+            [.items[] | select(
+              (.metadata.name == "zinc-api" and (.kind == "Deployment" or .kind == "Service" or .kind == "Ingress"))
+              or (.kind == "ConfigMap" and .metadata.name == "zinc-api-config"))]
+            | sort_by(.kind, .metadata.name);
+          ($before[0] | api) as $b | ($after[0] | api) as $a |
+          if $app[0].status.sync.status != "Synced" or $app[0].status.health.status != "Healthy"
+             or $app[0].status.operationState.phase != "Succeeded"
+          then error("Application is not Synced/Healthy/Succeeded") else . end |
+          if ($b | length) != 4 or ($a | length) != 4
+             or ($b | unique_by(.kind, .metadata.name) | length) != 4
+             or ($a | unique_by(.kind, .metadata.name) | length) != 4
+          then error("API resources are missing or duplicated, even if Argo is Healthy") else . end |
+          if all(range(0; 4); . as $i |
+            $b[$i].metadata as $old | $a[$i].metadata as $new |
+            $a[$i].kind == $b[$i].kind and $new.name == $old.name and $new.namespace == $old.namespace
+            and ($new.uid | length) > 0 and $new.uid == $old.uid
+            and ($new.creationTimestamp | length) > 0 and $new.creationTimestamp == $old.creationTimestamp
+            and ($new.annotations["argocd.argoproj.io/tracking-id"] | length) > 0
+            and $new.annotations["argocd.argoproj.io/tracking-id"] == $old.annotations["argocd.argoproj.io/tracking-id"]
+            and $new.annotations["argocd.argoproj.io/hook"] == null
+            and ($new.finalizers // [] | length) == 0 and $new.deletionTimestamp == null)
+          then . else error("API identity changed, hook/finalizer remains, or deletion is pending") end |
+          if any($app[0].status.resources[]?;
+            ((.name == "zinc-api" and (.kind == "Deployment" or .kind == "Service" or .kind == "Ingress"))
+             or (.kind == "ConfigMap" and .name == "zinc-api-config")) and (.requiresPruning == true or .hook == true))
+          then error("API is still a hook or prune candidate") else . end |
+          if any($after[0].items[]; .kind == "EndpointSlice"
+            and .metadata.labels["kubernetes.io/service-name"] == "zinc-api"
+            and .metadata.namespace == $a[0].metadata.namespace
+            and any(.endpoints[]?; .conditions.ready == true))
+          then "PASS: API identities preserved, no API prune candidates, ready endpoints present"
+          else error("API has zero ready endpoints, even if Argo is Healthy") end
+        '
+
+  rollout-state-check:test:
+    desc: Rejects misleading Argo Healthy states and identity changes without cluster access
+    silent: true
+    cmds:
+      - |
+        set -euo pipefail
+        dir="$(mktemp -d)"
+        trap 'rm -rf "$dir"' EXIT
+        jq -n '{items: ((["Deployment", "Service", "Ingress", "ConfigMap"] | map(. as $kind | {
+          kind: $kind, metadata: {name: (if $kind == "ConfigMap" then "zinc-api-config" else "zinc-api" end),
+          namespace: "alcohol", uid: $kind, creationTimestamp: "2026-11-13T00:00:00Z",
+          annotations: {"argocd.argoproj.io/tracking-id": $kind}}})) + [{kind: "EndpointSlice",
+          metadata: {namespace: "alcohol", labels: {"kubernetes.io/service-name": "zinc-api"}}, endpoints: [{conditions: {ready: true}}]}])}' >"$dir/before"
+        echo '{"status":{"sync":{"status":"Synced"},"health":{"status":"Healthy"},"operationState":{"phase":"Succeeded"}}}' >"$dir/app"
+        check() {
+          jq "$3" "$dir/before" >"$dir/after"
+          if "{{.TASK_EXE}}" rollout-state-check -- "$dir/before" "$dir/after" "$dir/app" >"$dir/log" 2>&1; then result=pass; else result=fail; fi
+          if [ "$result" != "$2" ]; then echo "FAIL $1: expected $2"; cat "$dir/log"; exit 1; fi
+          echo "ok   $1 ($result)"
+        }
+        check "healthy adoption" pass '.'
+        check "Healthy but missing Service" fail 'del(.items[1])'
+        check "Healthy but all API objects pruned" fail '.items |= map(select(.kind == "EndpointSlice"))'
+        check "Healthy but zero ready endpoints" fail '.items[4].endpoints[0].conditions.ready = false'
+        check "API recreated" fail '.items[0].metadata.uid = "replacement"'
+        check "API tracking changed" fail '.items[0].metadata.annotations["argocd.argoproj.io/tracking-id"] = "other"'
+        check "API deletion pending" fail '.items[0].metadata.deletionTimestamp = "2026-11-13T00:00:01Z"'
+        check "API is still a hook" fail '.items[0].metadata.annotations["argocd.argoproj.io/hook"] = "Sync"'
+        echo "✅ rollout state acceptance cases passed"
