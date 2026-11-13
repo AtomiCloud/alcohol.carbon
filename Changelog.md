@@ -1,3 +1,10 @@
+## [1.30.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.10...v1.30.0) (2026-11-13)
+
+
+### ✨ Features ✨
+
+* zinc v1.43.0 (habit reorder with saved per-user order) ([24683b0](https://github.com/AtomiCloud/alcohol.carbon/commit/24683b077cbae6fca630e6630c2cdac1e5ee857d))
+
 ## [1.29.10](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.9...v1.29.10) (2026-11-13)
 
 
