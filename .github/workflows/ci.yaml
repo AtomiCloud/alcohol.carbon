@@ -21,4 +21,8 @@ jobs:
       atomi_platform: alcohol
       atomi_service: carbon
       chart_path: ./chart
+  deploy-test:
+    name: Deploy Test
+    uses: ./.github/workflows/⚡reusable-deploy-test.yaml
+    secrets: inherit
   #

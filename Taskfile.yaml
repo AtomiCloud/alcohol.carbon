@@ -55,3 +55,163 @@ tasks:
         vars:
           NAME: lithium
           OCI: ghcr.io/atomicloud/aldehyde.lithium/aldehyde-lithium
+
+  # Deploy checks. Kept in the Taskfile, not scripts/ci/*.sh: commits are signed through the
+  # GitHub API, which cannot set a new file's executable bit.
+  render-test:
+    desc: Checks that the composed chart rolls zinc's API out without downtime on every landscape
+    silent: true
+    cmds:
+      - |
+        set -euo pipefail
+        out="$(mktemp)"
+        trap 'rm -f "$out"' EXIT
+        fails=0
+        fail() { echo "FAIL [$1] $2"; fails=$((fails + 1)); }
+        api='select(.metadata.labels."atomi.cloud/service" == "zinc" and .metadata.labels."atomi.cloud/module" == "api")'
+        dep="$api | select(.kind == \"Deployment\")"
+        c='.spec.template.spec.containers[0]'
+        for l in pichu pikachu raichu; do
+          helm template "$l-ruby-alcohol-carbon" chart -n alcohol -f chart/values.yaml -f "chart/values.$l.yaml" >"$out"
+          [ -n "$(yq -N "$dep | .metadata.name" "$out")" ] || { fail "$l" "zinc API Deployment not rendered"; continue; }
+
+          # Argo CD deletes and recreates hook resources on every sync: the API must not be one.
+          hooked="$(yq -N "$api | select(.metadata.annotations.\"argocd.argoproj.io/hook\" != null) | .kind + \"/\" + .metadata.name" "$out" | xargs)"
+          [ -z "$hooked" ] || fail "$l" "zinc API resources are Argo CD hooks: $hooked"
+          job="$(yq -N 'select(.kind == "Job" and .metadata.labels."atomi.cloud/service" == "zinc") | .metadata.annotations."argocd.argoproj.io/hook" + " " + .metadata.annotations."argocd.argoproj.io/sync-wave"' "$out")"
+          [ "$job" = "Sync 3" ] || fail "$l" "zinc migration Job must be a Sync hook in wave 3, got '$job'"
+
+          unavailable="$(yq -N "$dep | .spec.strategy.rollingUpdate.maxUnavailable // \"unset\"" "$out")"
+          surge="$(yq -N "$dep | .spec.strategy.rollingUpdate.maxSurge // 0" "$out")"
+          [ "$unavailable" = "0" ] || fail "$l" "maxUnavailable must be 0, got '$unavailable'"
+          [ "$surge" -ge 1 ] 2>/dev/null || fail "$l" "maxSurge must be at least 1, got '$surge'"
+
+          ready="$(yq -N "$dep | $c.readinessProbe.httpGet.path + \" \" + ($c.readinessProbe.periodSeconds // 999 | tostring)" "$out")"
+          [ "${ready% *}" = "/health/ready" ] && [ "${ready#* }" -le 5 ] \
+            || fail "$l" "readinessProbe must be /health/ready every 5 s or less, got '$ready'"
+          [ "$(yq -N "$dep | $c.livenessProbe.httpGet.path // \"\"" "$out")" = "/health/live" ] \
+            || fail "$l" "livenessProbe must be /health/live"
+          [ "$(yq -N "$dep | $c.startupProbe.httpGet.path // \"\"" "$out")" = "/health/live" ] \
+            || fail "$l" "startupProbe on /health/live is missing"
+          [ -n "$(yq -N "$dep | $c.lifecycle.preStop.exec.command // \"\"" "$out")" ] || fail "$l" "preStop is missing"
+        done
+        if [ "$fails" -gt 0 ]; then echo "❌ $fails chart check(s) failed"; exit 1; fi
+        echo "✅ zinc API checks passed on the composed chart for pichu, pikachu and raichu"
+
+  rollout-probe:
+    desc: >-
+      Polls GET <base-url>/ once a second through a zinc rollout and fails on any non-2xx or two
+      timeouts in a row. Usage: pls rollout-probe -- <base-url> <expected-zinc-version>
+    silent: true
+    cmds:
+      - |
+        set -euo pipefail
+        set -- {{.CLI_ARGS}}
+        base="${1:?base url, e.g. https://api.zinc.alcohol.pichu.cluster.atomi.cloud}"
+        expected="${2:?expected zinc version, e.g. v1.44.0}"
+        interval="${PROBE_INTERVAL_S:-1}"
+        stable_s="${PROBE_STABLE_S:-60}"
+        timeout_s="${PROBE_TIMEOUT_S:-1200}"
+        fixed_s="${PROBE_FIXED_S:-300}"
+        body="$(mktemp)"
+        changes="$(mktemp)"
+        trap 'rm -f "$body" "$changes"' EXIT
+
+        start="$(date +%s)"
+        failed=0; errs=0; mode=""; last=""; stable_since=""; result=""
+        while :; do
+          now="$(date +%s)"
+          ts="$(date -u +%H:%M:%S)"
+          ok=0
+          if code="$(curl -s -m 3 -o "$body" -w '%{http_code}' "$base/")"; then
+            errs=0
+            ver="$(jq -r '.version // ""' "$body" 2>/dev/null || true)"
+            case "$code" in 2??) ok=1 ;; *) failed=1 ;; esac
+            state="$code ${ver:-?}"
+          else
+            errs=$((errs + 1)); ver=""
+            [ "$errs" -lt 2 ] || failed=1
+            state="no response (timeout or connection error)"
+          fi
+          echo "$ts $state"
+          [ "$state" = "$last" ] || { echo "$ts $state" >>"$changes"; last="$state"; }
+
+          if [ -z "$mode" ]; then
+            if [ "$ver" = "$expected" ]; then mode=fixed; echo "already serving $expected: polling for ${fixed_s}s"
+            else mode=rollout; fi
+          fi
+          if [ "$mode" = fixed ]; then
+            [ $((now - start)) -lt "$fixed_s" ] || break
+          else
+            if [ "$ok" = 1 ] && [ "$ver" = "$expected" ]; then
+              [ -n "$stable_since" ] || stable_since="$now"
+              [ $((now - stable_since)) -lt "$stable_s" ] || break
+            else
+              stable_since=""
+            fi
+            if [ $((now - start)) -ge "$timeout_s" ]; then result="rollout not observed: $expected was not served for ${stable_s}s within ${timeout_s}s"; break; fi
+          fi
+          sleep "$interval"
+        done
+
+        echo "--- timeline (status and version changes, UTC)"
+        cat "$changes"
+        if [ -n "$result" ]; then echo "❌ $result"; exit 1; fi
+        if [ "$failed" = 1 ]; then echo "❌ the API returned a non-2xx or stopped answering during the rollout"; exit 1; fi
+        echo "✅ zero non-2xx responses; $expected served for ${stable_s}s"
+
+  rollout-probe:test:
+    desc: Runs the rollout probe against a local stub server
+    silent: true
+    cmds:
+      # bash, not Task's built-in shell, which has no $! for background jobs.
+      - |
+        bash <<'BASH'
+        set -euo pipefail
+        stub="$(mktemp)"
+        trap 'rm -f "$stub"' EXIT
+        # Serves one planned "status:version" per request; the last entry repeats.
+        cat >"$stub" <<'PY'
+        import http.server, json, sys
+        plan, n = sys.argv[2].split(","), [0]
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                code, ver = plan[min(n[0], len(plan) - 1)].split(":")
+                n[0] += 1
+                body = json.dumps({"version": ver, "status": "OK"}).encode()
+                self.send_response(int(code))
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            def log_message(self, *a):
+                pass
+        http.server.HTTPServer(("127.0.0.1", int(sys.argv[1])), H).serve_forever()
+        PY
+        fails=0
+        case_() {
+          name="$1"; want="$2"; plan="$3"
+          port=$((20000 + RANDOM % 20000))
+          python3 -I "$stub" "$port" "$plan" &
+          pid=$!
+          sleep 0.5
+          set +e
+          PROBE_INTERVAL_S=0.2 PROBE_STABLE_S=2 PROBE_TIMEOUT_S=6 PROBE_FIXED_S=2 \
+            "{{.TASK_EXE}}" rollout-probe -- "http://127.0.0.1:$port" v2 >/dev/null 2>&1
+          rc=$?
+          set -e
+          kill "$pid" 2>/dev/null || true
+          if { [ "$want" = pass ] && [ "$rc" = 0 ]; } || { [ "$want" = fail ] && [ "$rc" != 0 ]; }; then
+            echo "ok   $name (exit $rc)"
+          else
+            echo "FAIL $name: wanted $want, exit $rc"; fails=$((fails + 1))
+          fi
+        }
+        case_ "version flips with only 200s" pass "200:v1,200:v1,200:v1,200:v2"
+        case_ "2 s burst of 503" fail "200:v1,200:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,503:v1,200:v2"
+        case_ "a single 404" fail "200:v1,404:,200:v2"
+        case_ "version never flips" fail "200:v1"
+        case_ "already on the version, all 200s" pass "200:v2"
+        if [ "$fails" -gt 0 ]; then echo "❌ $fails probe case(s) failed"; exit 1; fi
+        echo "✅ rollout probe cases passed"
+        BASH

@@ -1,0 +1,20 @@
+name: ⚡ Reusable Deploy Test
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    name: Deploy Checks
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: AtomiCloud/actions.setup-nix@v2
+        with:
+          namespacelabs: 'false'
+
+      # Fails if the composed chart would recreate zinc's API or drop it below one ready pod.
+      - name: Chart render test
+        run: nix develop -c pls render-test
+
+      - name: Rollout probe against a stub server
+        run: nix develop -c pls rollout-probe:test

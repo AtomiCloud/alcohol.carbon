@@ -5,11 +5,24 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  # Probes a landscape by hand, e.g. while pikachu or raichu is promoted.
+  workflow_dispatch:
+    inputs:
+      landscape:
+        description: Landscape whose zinc API to probe
+        type: choice
+        options: [pichu, pikachu, raichu]
+        default: pichu
+      version:
+        description: Expected zinc version (GET / .version), e.g. v1.44.0. Default is the one in chart/Chart.yaml.
+        type: string
+        required: false
 jobs:
   #
   #
   helm:
     name: Helm Chart
+    if: github.event_name == 'push'
     uses: ./.github/workflows/⚡reusable-helm.yaml
     secrets: inherit
     with:
@@ -18,5 +31,24 @@ jobs:
       chart_path: ./chart
 
       version: ${{ github.ref_name }}
+  # pichu syncs every carbon release by itself, so the probe starts with the publish and
+  # watches the whole rollout. Fails on any non-2xx from GET /.
+  rollout-probe:
+    name: Rollout Probe
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: AtomiCloud/actions.setup-nix@v2
+        with:
+          namespacelabs: 'false'
+
+      - name: Probe zinc API through the rollout
+        env:
+          LANDSCAPE: ${{ inputs.landscape || 'pichu' }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          version="${VERSION:-$(nix develop -c yq '.dependencies[] | select(.alias == "zinc") | .version' chart/Chart.yaml)}"
+          nix develop -c pls rollout-probe -- "https://api.zinc.alcohol.${LANDSCAPE}.cluster.atomi.cloud" "$version"
   #
+
 #
