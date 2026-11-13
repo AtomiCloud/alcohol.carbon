@@ -1,3 +1,10 @@
+## [1.30.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.30.0...v1.30.1) (2026-11-13)
+
+
+### 🐛 Bug Fixes 🐛
+
+* zinc v1.43.1 (validation, quota races and expired subscriptions) ([f847eab](https://github.com/AtomiCloud/alcohol.carbon/commit/f847eab26d75ce0f948a34982b82dabf98c8b2a1))
+
 ## [1.30.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.29.10...v1.30.0) (2026-11-13)
 
 
