@@ -57,6 +57,13 @@ zinc:
     serviceTree:
       <<: *serviceTree
     replicaCount: 1
+    image:
+      repository: ghcr.io/atomicloud/alcohol.zinc/api
+      tag: b2e55c-fix-migrator-target-platform@sha256:f9325a57eb8cb9d0eecd36fa1f246d2b67247f9339e31dbe4f7856233ab27b0c
+    appSettings:
+      Database:
+        MAIN:
+          AutoMigrate: false
     service:
       type: ClusterIP
       port: 80
@@ -72,5 +79,9 @@ zinc:
             - api.zinc.alcohol.pichu.cluster.atomi.cloud
           secretName: api-zinc-alcohol-pichu-tls
   migration:
+    enabled: false
+    image:
+      repository: ghcr.io/atomicloud/alcohol.zinc/migrate
+      tag: b2e55c-fix-migrator-target-platform@sha256:a1d8e5bbacae725261708464e4403537b63e1ee401daa6f1c0a03c27ee1ae4d7
     serviceTree:
       <<: *serviceTree
