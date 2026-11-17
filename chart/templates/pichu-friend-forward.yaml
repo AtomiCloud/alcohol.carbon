@@ -1,0 +1,32 @@
+{{- if eq .Values.serviceTree.landscape "pichu" }}
+{{- if .Values.zinc.migration.enabled }}
+{{- fail "Pichu friend recovery requires the standard migration Job disabled" }}
+{{- end }}
+{{- $zinc := index .Subcharts "zinc" }}
+{{- $api := index $zinc.Subcharts "api" }}
+{{- $settings := deepCopy .Values.zinc.migration.appSettings }}
+{{- $_ := set $settings "Database" (dict "MAIN" (dict "AutoMigrate" false)) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zinc-migration-config
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+data:
+  settings.yaml: |
+    {{- merge (deepCopy $settings) ($api.Files.Get "app/settings.yaml" | fromYaml) | toYaml | nindent 4 }}
+  settings.pichu.yaml: |
+    {{- merge (deepCopy $settings) ($api.Files.Get "app/settings.pichu.yaml" | fromYaml) | toYaml | nindent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zinc-friend-forward-b2e55c8
+  annotations:
+    argocd.argoproj.io/sync-wave: '3'
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  backoffLimit: 0
+  template:
+    {{- .Files.Get "files/pichu-friend-forward-pod.yaml" | fromYaml | toYaml | nindent 4 }}
+{{- end }}

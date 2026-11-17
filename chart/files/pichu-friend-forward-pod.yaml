@@ -1,0 +1,84 @@
+# Reconstructed from published alcohol-carbon v1.30.1, not the unavailable
+# a9eeac4d5839a31b438394747ac02311a7f572f6a2fa6aced0b80b71d0e20cb0 file.
+# Keep this template fixed: an existing Job mismatch must fail, never replace.
+metadata:
+  annotations:
+    helm.sh/chart: migration-0.1.0
+    app.kubernetes.io/version: v1.43.1
+    atomi.cloud/chart: migration-0.1.0
+    atomi.cloud/landscape: pichu
+    atomi.cloud/layer: '2'
+    atomi.cloud/module: migration
+    atomi.cloud/platform: alcohol
+    atomi.cloud/service: zinc
+    drop_log: 'true'
+  labels:
+    app.kubernetes.io/name: zinc-migration
+    app.kubernetes.io/instance: pichu-ruby-alcohol-carbon
+    atomi.cloud/landscape: pichu
+    atomi.cloud/layer: '2'
+    atomi.cloud/module: migration
+    atomi.cloud/platform: alcohol
+    atomi.cloud/service: zinc
+    app.kubernetes.io/managed-by: Helm
+spec:
+  restartPolicy: Never
+  serviceAccountName: default
+  nodeSelector:
+    kubernetes.io/arch: amd64
+  securityContext:
+    fsGroup: 1000
+    runAsGroup: 1000
+    runAsNonRoot: true
+    runAsUser: 1000
+  containers:
+    - name: migration
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: false
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      image: ghcr.io/atomicloud/alcohol.zinc/migrate@sha256:a1d8e5bbacae725261708464e4403537b63e1ee401daa6f1c0a03c27ee1ae4d7
+      imagePullPolicy: IfNotPresent
+      workingDir: /app
+      command:
+        - ./efbundle
+      args:
+        - 20261115042211_RetainFriendRequestOccurrences
+      envFrom:
+        - secretRef:
+            name: zinc
+      env:
+        - name: OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES
+          value: 'true'
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: LANDSCAPE
+          value: pichu
+      volumeMounts:
+        - mountPath: /app/Config/settings.yaml
+          name: config-volume
+          subPath: settings.yaml
+        - mountPath: /app/Config/settings.pichu.yaml
+          name: config-volume
+          subPath: settings.pichu.yaml
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+        requests:
+          cpu: 100m
+          memory: 128Mi
+  volumes:
+    - name: config-volume
+      configMap:
+        name: zinc-migration-config
+        items:
+          - key: settings.yaml
+            path: settings.yaml
+          - key: settings.pichu.yaml
+            path: settings.pichu.yaml
