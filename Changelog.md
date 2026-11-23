@@ -1,3 +1,10 @@
+## [1.30.2](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.30.1...v1.30.2) (2026-11-23)
+
+
+### 🐛 Bug Fixes 🐛
+
+* zinc v1.45.2 (friend request occurrences, charity decommission) ([6772e03](https://github.com/AtomiCloud/alcohol.carbon/commit/6772e03eff6fd0e91728438ecfe8e7b2803f54a1))
+
 ## [1.30.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.30.0...v1.30.1) (2026-11-13)
 
 
