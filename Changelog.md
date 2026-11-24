@@ -1,3 +1,10 @@
+## [1.31.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.30.2...v1.31.0) (2026-11-24)
+
+
+### ✨ Features ✨
+
+* zinc v1.46.0 (habit time, Strava one activity per habit) ([90d7831](https://github.com/AtomiCloud/alcohol.carbon/commit/90d7831dffded2e06e3459d002d7ac8cf765d058))
+
 ## [1.30.2](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.30.1...v1.30.2) (2026-11-23)
 
 
