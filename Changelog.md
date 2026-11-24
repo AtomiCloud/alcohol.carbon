@@ -1,3 +1,10 @@
+## [1.32.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.31.0...v1.32.0) (2026-11-24)
+
+
+### ✨ Features ✨
+
+* zinc v1.47.0 (owed list, retry uncharged penalties) ([34b41a5](https://github.com/AtomiCloud/alcohol.carbon/commit/34b41a5a77d5becb1c2db467356c8df63a1fcfa8))
+
 ## [1.31.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.30.2...v1.31.0) (2026-11-24)
 
 
