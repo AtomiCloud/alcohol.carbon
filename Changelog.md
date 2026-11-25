@@ -1,3 +1,10 @@
+## [1.33.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.32.0...v1.33.0) (2026-11-25)
+
+
+### ✨ Features ✨
+
+* zinc v1.48.0 (undo a completion tapped in the app) ([f8a92c8](https://github.com/AtomiCloud/alcohol.carbon/commit/f8a92c8d25e93c9be2488f9834c5e2a5f57ea735))
+
 ## [1.32.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.31.0...v1.32.0) (2026-11-24)
 
 
