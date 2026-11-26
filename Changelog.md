@@ -1,3 +1,10 @@
+## [1.33.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.33.0...v1.33.1) (2026-11-26)
+
+
+### 🐛 Bug Fixes 🐛
+
+* zinc v1.48.1 (retry a declined penalty charge) ([#41](https://github.com/AtomiCloud/alcohol.carbon/issues/41)) ([96a205a](https://github.com/AtomiCloud/alcohol.carbon/commit/96a205a081d214b9fb8b30a6315fbead2a8c0ef8))
+
 ## [1.33.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.32.0...v1.33.0) (2026-11-25)
 
 
