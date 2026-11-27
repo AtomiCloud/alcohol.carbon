@@ -1,3 +1,10 @@
+## [1.34.0](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.33.1...v1.34.0) (2026-11-27)
+
+
+### ✨ Features ✨
+
+* zinc v1.49.0 (plan limits for skips and vacations) ([#42](https://github.com/AtomiCloud/alcohol.carbon/issues/42)) ([83e7395](https://github.com/AtomiCloud/alcohol.carbon/commit/83e73950ac9051ad17568bd67180afae76e957ac))
+
 ## [1.33.1](https://github.com/AtomiCloud/alcohol.carbon/compare/v1.33.0...v1.33.1) (2026-11-26)
 
 
