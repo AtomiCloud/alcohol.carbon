@@ -1,31 +1,21 @@
 #!/usr/bin/env bash
 
-[ "${DOMAIN}" = '' ] && echo "❌ 'DOMAIN' env var not set" && exit 1
-
-[ "${DOCKER_PASSWORD}" = '' ] && echo "❌ 'DOCKER_PASSWORD' env var not set" && exit 1
-[ "${DOCKER_USER}" = '' ] && echo "❌ 'DOCKER_USER' env var not set" && exit 1
-
-[ "${GITHUB_SHA}" = '' ] && echo "❌ 'GITHUB_SHA' env var not set" && exit 1
-[ "${GITHUB_BRANCH}" = '' ] && echo "❌ 'GITHUB_BRANCH' env var not set" && exit 1
-[ "${GITHUB_REPO_REF}" = '' ] && echo "❌ 'GITHUB_REPO_REF' env var not set" && exit 1
-
-chart_path="$1"
-SEMVER_VERSION="$2"
-
 set -euo pipefail
 
-SHA="$(echo "${GITHUB_SHA}" | head -c 6)"
-# shellcheck disable=SC2001
-BRANCH="$(echo "${GITHUB_BRANCH}" | sed 's/[._-]*$//')"
-COMMIT_VERSION="${SHA}-${BRANCH}"
-
-if [ "${SEMVER_VERSION}" = '' ]; then
-  HELM_VERSION="v0.0.0-${COMMIT_VERSION}"
-  IMAGE_VERSION="${COMMIT_VERSION}"
-else
-  HELM_VERSION="${SEMVER_VERSION}"
-  IMAGE_VERSION="${SEMVER_VERSION}"
+# Reject non-release invocations before reading credentials, changing files, or registry access.
+version="${2:-}"
+if [[ ${GITHUB_EVENT_NAME:-} != push || ${GITHUB_REF:-} != refs/tags/v*.*.* || -z $version || $version != "${GITHUB_REF_NAME:-}" || ${GITHUB_REF:-} != "refs/tags/$version" ]]; then
+  echo '❌ Publishing requires a tag push and a nonempty release version matching the tag' >&2
+  exit 1
 fi
+
+chart_path="${1:?Chart path required}"
+: "${DOMAIN:?DOMAIN env var not set}"
+: "${DOCKER_PASSWORD:?DOCKER_PASSWORD env var not set}"
+: "${DOCKER_USER:?DOCKER_USER env var not set}"
+: "${GITHUB_REPO_REF:?GITHUB_REPO_REF env var not set}"
+HELM_VERSION="$version"
+IMAGE_VERSION="$version"
 
 echo "📝 Generating Image tags..."
 echo "📝 Helm version: ${HELM_VERSION}"
